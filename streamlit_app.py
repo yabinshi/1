@@ -10,24 +10,23 @@ from langchain_community.vectorstores import Chroma
 
 def get_retriever():
     # 定义 Embeddings
-    embeddings = OpenAIEmbeddings(base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-                                  model="text-embedding-v4"
-                                  )
+    embedding = ZhipuAIEmbeddings()
     # 向量数据库持久化路径
     persist_directory = 'data_base/vector_db/chroma'
     # 加载数据库
     vectordb = Chroma(
         persist_directory=persist_directory,
-        embedding_function=embeddings
+        embedding_function=embedding
     )
     return vectordb.as_retriever()
+
 
 def combine_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs["context"])
 
 def get_qa_history_chain():
     retriever = get_retriever()
-    llm = ChatOpenAI(name="qwen3-max", temperature=0)
+    llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
     condense_question_system_template = (
         "请根据聊天记录总结用户最近的问题，"
         "如果没有多余的聊天记录则返回用户的问题。"
@@ -111,3 +110,4 @@ def main():
             output = st.write_stream(answer)
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
+

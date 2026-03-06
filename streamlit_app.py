@@ -61,8 +61,14 @@ def combine_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs["context"])
 
 def get_qa_history_chain():
+    st.write("开始加载检索器...")
     retriever = get_retriever()
-    llm = ChatOpenAI(model="qwen-max", temperature=0,base_url="https://dashscope.aliyuncs.com/compatible-mode/v1")
+    st.write("检索器加载完成，开始初始化 LLM...")
+    
+    # 修正模型名称为 qwen-max
+    llm = ChatOpenAI(model="qwen-max", temperature=0, base_url="https://dashscope.aliyuncs.com/compatible-mode/v1")
+    
+    st.write("LLM 初始化完成，正在构建 Chain...")
     condense_question_system_template = (
         "请根据聊天记录总结用户最近的问题，"
         "如果没有多余的聊天记录则返回用户的问题。"
@@ -151,6 +157,7 @@ def main():
             output = st.write_stream(answer)
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
+
 
 
 

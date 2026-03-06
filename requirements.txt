@@ -14,3 +14,5 @@ markdown==3.7
 streamlit==1.43.0
 jieba==0.42.1
 pydantic==2.10.6
+urllib3==1.26.15
+requests==2.31.0

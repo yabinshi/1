@@ -80,6 +80,7 @@ def gen_response(chain, input, chat_history):
             yield res["answer"]
 
 def main():
+    st.write("Debug: App is starting...") # 如果页面能显示这行，说明问题出在下面的初始化
     st.markdown('### 🦜🔗 动手学大模型应用开发')
     # st.session_state可以存储用户与应用交互期间的状态与数据
     # 存储对话历史
@@ -111,3 +112,4 @@ def main():
             output = st.write_stream(answer)
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
+

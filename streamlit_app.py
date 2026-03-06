@@ -112,6 +112,7 @@ def main():
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
 
+
 =======
 import streamlit as st
 from langchain_openai import ChatOpenAI,OpenAIEmbeddings
@@ -226,4 +227,3 @@ def main():
             output = st.write_stream(answer)
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
->>>>>>> 647ed8c (llm-universe-main)

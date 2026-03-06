@@ -21,7 +21,7 @@ def get_retriever():
         st.error(f"❌ 找不到数据库目录: {persist_directory}")
         st.stop() # 停止运行，防止白屏
         
-   embedding = ZhipuAIEmbeddings()
+        embedding = ZhipuAIEmbeddings()
     
     try:
         vectordb = Chroma(
@@ -124,6 +124,7 @@ def main():
             output = st.write_stream(answer)
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
+
 
 
 

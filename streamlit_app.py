@@ -90,6 +90,10 @@ def gen_response(chain, input, chat_history):
     for res in response:
         if "answer" in res.keys():
             yield res["answer"]
+            
+@st.cache_resource
+def load_chain():
+    return get_qa_history_chain()
 
 def main():
     st.write("Debug: App is starting...") # 如果页面能显示这行，说明问题出在下面的初始化
@@ -124,6 +128,7 @@ def main():
             output = st.write_stream(answer)
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
+
 
 
 

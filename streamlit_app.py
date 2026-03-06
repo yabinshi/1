@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import streamlit as st
 from langchain_openai import ChatOpenAI,OpenAIEmbeddings
 import os
@@ -227,3 +226,4 @@ def main():
             output = st.write_stream(answer)
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
+

@@ -39,7 +39,7 @@ def combine_docs(docs):
 
 def get_qa_history_chain():
     retriever = get_retriever()
-    llm = ChatOpenAI(name="qwen-max", temperature=0)
+    llm = ChatOpenAI(name="qwen-max", temperature=0,base_url="https://dashscope.aliyuncs.com/compatible-mode/v1")
     condense_question_system_template = (
         "请根据聊天记录总结用户最近的问题，"
         "如果没有多余的聊天记录则返回用户的问题。"
@@ -128,6 +128,7 @@ def main():
             output = st.write_stream(answer)
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
+
 
 
 

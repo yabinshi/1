@@ -29,30 +29,33 @@ check_secrets()
 st.title("Debug Mode: App is Loading...")
 st.write(f"当前工作目录: {os.getcwd()}")
 def get_retriever():
+    # 1. 确保绝对路径
     current_dir = os.path.dirname(os.path.abspath(__file__))
     persist_directory = os.path.join(current_dir, 'data_base/vector_db/chroma')
     
-    st.write(f"检查目录是否存在: {persist_directory}")
+    # 2. 修正变量定义位置：确保 embedding 始终被定义
+    st.write("🔄 正在初始化 Embedding 模型...")
+    # 直接显式传入 key，避免环境变量读取延迟
+    embedding = ZhipuAIEmbeddings(api_key=st.secrets["ZHIPUAI_API_KEY"])
+    
+    # 3. 检查目录
     if not os.path.exists(persist_directory):
-        st.error(f"❌ 找不到数据库目录，请检查 GitHub 是否成功上传了该文件夹")
-        st.stop() 
-    
-    # 修正：确保在 try 之前定义好 embedding
-    st.write("正在初始化 ZhipuAIEmbeddings...")
-    embedding = ZhipuAIEmbeddings()
-    
+        st.error(f"❌ 数据库目录丢失: {persist_directory}")
+        st.stop()
+
     try:
-        st.write("正在加载 Chroma 数据库...")
+        st.write("📂 正在打开 Chroma 索引文件...")
+        # 增加一个简单的超时提示或日志输出
         vectordb = Chroma(
             persist_directory=persist_directory,
             embedding_function=embedding
         )
-        st.write("数据库加载成功！")
+        st.success("✅ 数据库加载成功！")
         return vectordb.as_retriever()
     except Exception as e:
-        st.error(f"❌ 加载数据库失败，错误详情: {e}")
+        st.error(f"❌ Chroma 加载失败: {e}")
+        st.write("提示：请检查 GitHub 上的 data_base/vector_db/chroma 文件夹是否包含 .bin 和 sqlite3 文件。")
         st.stop()
-
 
 def combine_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs["context"])
@@ -148,6 +151,7 @@ def main():
             output = st.write_stream(answer)
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
+
 
 
 

@@ -12,16 +12,29 @@ from langchain_community.vectorstores import Chroma
 st.title("Debug Mode: App is Loading...")
 st.write(f"当前工作目录: {os.getcwd()}")
 def get_retriever():
-    # 定义 Embeddings
-    embedding = ZhipuAIEmbeddings()
-    # 向量数据库持久化路径
-    persist_directory = 'data_base/vector_db/chroma'
-    # 加载数据库
-    vectordb = Chroma(
-        persist_directory=persist_directory,
-        embedding_function=embedding
+    # 使用绝对路径确保在 Streamlit Cloud 环境中准确
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    persist_directory = os.path.join(current_dir, 'data_base/vector_db/chroma')
+    
+    # 调试信息：如果目录不存在，在页面上直接报错，而不是卡死
+    if not os.path.exists(persist_directory):
+        st.error(f"❌ 找不到数据库目录: {persist_directory}")
+        st.stop() # 停止运行，防止白屏
+        
+    embeddings = OpenAIEmbeddings(
+        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+        model="text-embedding-v4"
     )
-    return vectordb.as_retriever()
+    
+    try:
+        vectordb = Chroma(
+            persist_directory=persist_directory,
+            embedding_function=embeddings
+        )
+        return vectordb.as_retriever()
+    except Exception as e:
+        st.error(f"❌ 加载数据库失败: {e}")
+        st.stop()
 
 
 def combine_docs(docs):
@@ -114,5 +127,6 @@ def main():
             output = st.write_stream(answer)
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
+
 
 

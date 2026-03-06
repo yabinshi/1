@@ -21,15 +21,12 @@ def get_retriever():
         st.error(f"❌ 找不到数据库目录: {persist_directory}")
         st.stop() # 停止运行，防止白屏
         
-    embeddings = OpenAIEmbeddings(
-        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-        model="text-embedding-v4"
-    )
+   embedding = ZhipuAIEmbeddings()
     
     try:
         vectordb = Chroma(
             persist_directory=persist_directory,
-            embedding_function=embeddings
+            embedding_function=embedding
         )
         return vectordb.as_retriever()
     except Exception as e:
@@ -127,6 +124,7 @@ def main():
             output = st.write_stream(answer)
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
+
 
 
 

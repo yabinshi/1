@@ -12,25 +12,28 @@ from langchain_community.vectorstores import Chroma
 st.title("Debug Mode: App is Loading...")
 st.write(f"当前工作目录: {os.getcwd()}")
 def get_retriever():
-    # 使用绝对路径确保在 Streamlit Cloud 环境中准确
     current_dir = os.path.dirname(os.path.abspath(__file__))
     persist_directory = os.path.join(current_dir, 'data_base/vector_db/chroma')
     
-    # 调试信息：如果目录不存在，在页面上直接报错，而不是卡死
+    st.write(f"检查目录是否存在: {persist_directory}")
     if not os.path.exists(persist_directory):
-        st.error(f"❌ 找不到数据库目录: {persist_directory}")
-        st.stop() # 停止运行，防止白屏
-        
+        st.error(f"❌ 找不到数据库目录，请检查 GitHub 是否成功上传了该文件夹")
+        st.stop() 
+    
+    # 修正：确保在 try 之前定义好 embedding
+    st.write("正在初始化 ZhipuAIEmbeddings...")
     embedding = ZhipuAIEmbeddings()
     
     try:
+        st.write("正在加载 Chroma 数据库...")
         vectordb = Chroma(
             persist_directory=persist_directory,
             embedding_function=embedding
         )
+        st.write("数据库加载成功！")
         return vectordb.as_retriever()
     except Exception as e:
-        st.error(f"❌ 加载数据库失败: {e}")
+        st.error(f"❌ 加载数据库失败，错误详情: {e}")
         st.stop()
 
 
@@ -39,7 +42,7 @@ def combine_docs(docs):
 
 def get_qa_history_chain():
     retriever = get_retriever()
-    llm = ChatOpenAI(name="qwen3-max", temperature=0,base_url="https://dashscope.aliyuncs.com/compatible-mode/v1")
+    llm = ChatOpenAI(model="qwen3-max", temperature=0,base_url="https://dashscope.aliyuncs.com/compatible-mode/v1")
     condense_question_system_template = (
         "请根据聊天记录总结用户最近的问题，"
         "如果没有多余的聊天记录则返回用户的问题。"
@@ -128,6 +131,7 @@ def main():
             output = st.write_stream(answer)
         # 将输出存入st.session_state.messages
         st.session_state.messages.append(("ai", output))
+
 
 
 
